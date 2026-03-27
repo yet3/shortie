@@ -1,0 +1,12 @@
+[package]
+name = "shortie-cli"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+shortie-common = { path = "../common" }
+clap = { workspace = true }
+
+[[bin]]
+name = "shortie"
+path = "src/main.rs"

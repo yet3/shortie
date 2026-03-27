@@ -1,0 +1,13 @@
+[workspace]
+members = [
+    "crates/daemon",
+    "crates/cli",
+    "crates/common",
+]
+resolver = "2"
+
+[workspace.dependencies]
+serde = "1.0.228"
+serde-saphyr = "0.0.22"
+clap = { version = "4", features = ["derive"] }
+thiserror = "2.0.18"

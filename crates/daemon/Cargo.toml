@@ -1,0 +1,16 @@
+[package]
+name = "shortie-daemon"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+shortie-common = { path = "../common" }
+clap = { workspace = true }
+serde = { workspace = true }
+serde-saphyr = { workspace = true }
+enigo = "0.6.1"
+rdev = "0.5.3"
+
+[[bin]]
+name = "shortied"
+path = "src/main.rs"
