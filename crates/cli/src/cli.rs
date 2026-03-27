@@ -1,10 +1,9 @@
+use crate::daemon::{DaemonOpts, is_pid_running, kill_daemon, spawn_daemon};
 use shortie_common::config::parse_config;
 use std::{
     fs::{self, File},
     io::{Read, Seek, SeekFrom, Write},
 };
-
-use crate::daemon::{PID_FILE_PATH, is_pid_running, kill_daemon, spawn_daemon};
 
 fn log_not_running() {
     println!("The shortie-daemon is not currently running");
@@ -14,16 +13,15 @@ fn log_running() {
     println!("The shortie-daemon is already running");
 }
 
-pub fn start_dameon() {
-    if let Err(e) = parse_config() {
+pub fn start_dameon(opts: &DaemonOpts) {
+    if let Err(e) = parse_config(&opts.config) {
         panic!("{}", e);
     }
-
     let mut file = File::options()
         .write(true)
         .read(true)
         .create(true)
-        .open(PID_FILE_PATH)
+        .open(&opts.pid_file_path())
         .unwrap();
 
     let mut buf = String::new();
@@ -34,7 +32,7 @@ pub fn start_dameon() {
         return;
     }
 
-    let proccess_pid = spawn_daemon();
+    let proccess_pid = spawn_daemon(opts);
 
     file.seek(SeekFrom::Start(0)).unwrap();
     file.set_len(0).unwrap();
@@ -43,8 +41,8 @@ pub fn start_dameon() {
     println!("Started shortie-daemon (PID: {})", proccess_pid);
 }
 
-pub fn stop_daemon() {
-    let pid = fs::read_to_string(PID_FILE_PATH).unwrap_or(String::new());
+pub fn stop_daemon(opts: &DaemonOpts) {
+    let pid = fs::read_to_string(opts.pid_file_path()).unwrap_or(String::new());
 
     if pid.len() == 0 {
         log_not_running();
@@ -52,13 +50,13 @@ pub fn stop_daemon() {
     }
 
     kill_daemon(&pid);
-    fs::remove_file(PID_FILE_PATH).unwrap_or_else(|err| {
+    fs::remove_file(opts.pid_file_path()).unwrap_or_else(|err| {
         panic!("Error deleting shortie-daemon pid file: {}", err);
     })
 }
 
-pub fn print_daemon_status() {
-    let pid = fs::read_to_string(PID_FILE_PATH).unwrap_or(String::new());
+pub fn print_daemon_status(opts: &DaemonOpts) {
+    let pid = fs::read_to_string(opts.pid_file_path()).unwrap_or(String::new());
     println!("========= Shortie =========");
     println!(
         "Status: {}",

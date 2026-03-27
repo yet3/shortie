@@ -1,7 +1,10 @@
 mod cli;
 mod daemon;
-use crate::cli::{print_daemon_status, start_dameon, stop_daemon};
-use clap::{Parser, Subcommand};
+use crate::{
+    cli::{print_daemon_status, start_dameon, stop_daemon},
+    daemon::DaemonOpts,
+};
+use clap::{Args, Parser, Subcommand};
 
 #[derive(Parser)]
 struct Cli {
@@ -9,26 +12,68 @@ struct Cli {
     command: Cmds,
 }
 
+#[derive(Args)]
+struct CmdArgs {
+    /// Path to the directory containing .yaml config files
+    #[arg(short, long, default_value = None)]
+    config: Option<String>,
+
+    /// Path to the directory containing temporary .pid file
+    #[arg(short, long, default_value = None)]
+    pid: Option<String>,
+}
+
 #[derive(Subcommand)]
 enum Cmds {
-    Start,
-    Stop,
-    Reload,
-    Status,
+    Start {
+        #[command(flatten)]
+        args: CmdArgs,
+    },
+    Stop {
+        #[command(flatten)]
+        args: CmdArgs,
+    },
+    Reload {
+        #[command(flatten)]
+        args: CmdArgs,
+    },
+    Status {
+        #[command(flatten)]
+        args: CmdArgs,
+    },
+}
+
+fn make_opts(args: CmdArgs) -> DaemonOpts {
+    let mut opts = DaemonOpts::new();
+
+    if let Some(config) = args.config {
+        opts.config = config;
+    }
+
+    if let Some(pid) = args.pid {
+        opts.pid = pid;
+    }
+
+    opts
 }
 
 fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Cmds::Start => start_dameon(),
-        Cmds::Stop => stop_daemon(),
-        Cmds::Reload => {
-            stop_daemon();
-            start_dameon();
+        Cmds::Start { args } => {
+            start_dameon(&make_opts(args));
         }
-        Cmds::Status => {
-            print_daemon_status();
+        Cmds::Stop { args } => {
+            stop_daemon(&make_opts(args));
+        }
+        Cmds::Reload { args } => {
+            let opts = &make_opts(args);
+            stop_daemon(&opts);
+            start_dameon(&opts);
+        }
+        Cmds::Status { args } => {
+            print_daemon_status(&make_opts(args));
         }
     };
 }

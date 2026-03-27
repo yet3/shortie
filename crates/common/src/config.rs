@@ -112,13 +112,8 @@ pub fn read_configs_in_dir(path: &str) -> Result<Vec<ConfigFile>, ConfigError> {
     Ok(configs)
 }
 
-pub fn parse_config() -> Result<Config, ConfigError> {
-    let configs = read_configs_in_dir(
-        &dirs::home_dir()
-            .unwrap()
-            .join(".config/shortie")
-            .to_string_lossy(),
-    )?;
+pub fn parse_config(config_path: &str) -> Result<Config, ConfigError> {
+    let configs = read_configs_in_dir(config_path)?;
 
     let mut groups: HashMap<String, GroupedShorts> = HashMap::new();
     let mut max_len: usize = 0;

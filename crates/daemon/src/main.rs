@@ -1,3 +1,4 @@
+use clap::Parser;
 use enigo::{Enigo, Key, Keyboard, Settings};
 use rdev::{Event, EventType, Key as RKey, listen};
 use shortie_common::config::{Config, GroupedShorts, parse_config};
@@ -76,14 +77,22 @@ fn event_callback(event: Event, config: &Config, state: &Mutex<InputState>) {
     }
 }
 
+#[derive(Parser)]
+struct Cli {
+    /// Path to the directory containing .yaml config files
+    #[arg(short, long)]
+    config: String,
+}
+
 fn main() {
-    let config = parse_config().unwrap_or_else(|err| {
+    let cli = Cli::parse();
+
+    let config = parse_config(&cli.config).unwrap_or_else(|err| {
         println!("{err}");
         return Config {
             max_len: 0,
             groups: HashMap::new(),
-        }
-        // panic!("{err}");
+        };
     });
 
     let state = Arc::new(Mutex::new(InputState {

@@ -1,7 +1,8 @@
 use core::panic;
-use std::process::{Command, Stdio};
-
-pub static PID_FILE_PATH: &str = "/tmp/shortiedapp.pid";
+use std::{
+    env::current_exe,
+    process::{Command, Stdio},
+};
 
 pub fn is_pid_running(pid: &str) -> bool {
     if pid.len() == 0 {
@@ -15,9 +16,44 @@ pub fn is_pid_running(pid: &str) -> bool {
         .unwrap_or(false)
 }
 
-pub fn spawn_daemon() -> String {
-    let child = Command::new("cargo")
-        .args(["run", "-p", "shortie-daemon"])
+pub struct DaemonOpts {
+    pub config: String,
+    pub pid: String,
+}
+
+impl DaemonOpts {
+    pub fn new() -> Self {
+        DaemonOpts {
+            config: String::from("/Users/yet3/.config/shortie"),
+            pid: String::from("/tmp/shortied.pid"),
+        }
+    }
+
+    pub fn pid_file_path(&self) -> &str {
+        &self.pid
+    }
+}
+
+pub fn spawn_daemon(opts: &DaemonOpts) -> String {
+    let mut cmd = "cargo".to_string();
+    let mut args = vec!["run", "-p", "shortie-daemon", "--"];
+    if !cfg!(debug_assertions) {
+        let exe_dir = current_exe()
+            .expect("Failed to get current exe")
+            .parent()
+            .expect("No parent dir")
+            .to_owned();
+
+        cmd = exe_dir.join("shortied").to_string_lossy().to_string();
+
+        args.clear();
+    }
+
+    args.push("--config");
+    args.push(&opts.config);
+
+    let child = Command::new(cmd)
+        .args(args)
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()
