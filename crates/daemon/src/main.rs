@@ -56,7 +56,7 @@ fn event_callback(event: Event, config: &Config, state: &Mutex<InputState>) {
                         group = groups.get(first_char);
                     }
 
-                    if s.current_input.len() >= config.max_len {
+                    if s.current_input.len() > config.max_len {
                         s.current_input.remove(0);
                     }
 
