@@ -25,18 +25,22 @@ struct CmdArgs {
 
 #[derive(Subcommand)]
 enum Cmds {
+    /// Start shortie-daemon
     Start {
         #[command(flatten)]
         args: CmdArgs,
     },
+    /// Stop shortie-daemon
     Stop {
         #[command(flatten)]
         args: CmdArgs,
     },
+    /// Reload shortie-daemon
     Reload {
         #[command(flatten)]
         args: CmdArgs,
     },
+    /// See status of shortie-daemon
     Status {
         #[command(flatten)]
         args: CmdArgs,
