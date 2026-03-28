@@ -1,6 +1,7 @@
 use core::panic;
 use std::{
     env::current_exe,
+    path::PathBuf,
     process::{Command, Stdio},
 };
 
@@ -24,7 +25,12 @@ pub struct DaemonOpts {
 impl DaemonOpts {
     pub fn new() -> Self {
         DaemonOpts {
-            config: String::from("/Users/yet3/.config/shortie"),
+            config: String::from(
+                PathBuf::from(dirs::home_dir().expect("Failed to get path from $HOME"))
+                    .join(".config/shortie")
+                    .to_string_lossy()
+                    .to_string(),
+            ),
             pid: String::from("/tmp/shortied.pid"),
         }
     }

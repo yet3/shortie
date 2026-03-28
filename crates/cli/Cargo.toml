@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 shortie-common = { path = "../common" }
 clap = { workspace = true }
+dirs = "6.0.0"
 
 [[bin]]
 name = "shortie"
