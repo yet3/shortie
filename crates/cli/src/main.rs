@@ -21,6 +21,10 @@ struct CmdArgs {
     /// Path to the directory containing temporary .pid file
     #[arg(short, long, default_value = None)]
     pid: Option<String>,
+
+    /// Disable cli output 
+    #[arg(short, long, default_value_t = false)]
+    silent: bool,
 }
 
 #[derive(Subcommand)]
@@ -57,6 +61,8 @@ fn make_opts(args: CmdArgs) -> DaemonOpts {
     if let Some(pid) = args.pid {
         opts.pid = pid;
     }
+
+    opts.silent = args.silent;
 
     opts
 }

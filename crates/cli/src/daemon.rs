@@ -20,6 +20,7 @@ pub fn is_pid_running(pid: &str) -> bool {
 pub struct DaemonOpts {
     pub config: String,
     pub pid: String,
+    pub silent: bool,
 }
 
 impl DaemonOpts {
@@ -32,6 +33,7 @@ impl DaemonOpts {
                     .to_string(),
             ),
             pid: String::from("/tmp/shortied.pid"),
+            silent: false,
         }
     }
 
