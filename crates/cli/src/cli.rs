@@ -27,8 +27,10 @@ pub fn start_dameon(opts: &DaemonOpts) {
     let mut buf = String::new();
     file.read_to_string(&mut buf).unwrap();
 
-    if is_pid_running(&buf) && !opts.silent {
-        log_running();
+    if is_pid_running(&buf) {
+        if !opts.silent {
+            log_running();
+        }
         return;
     }
 
@@ -46,8 +48,10 @@ pub fn start_dameon(opts: &DaemonOpts) {
 pub fn stop_daemon(opts: &DaemonOpts) {
     let pid = fs::read_to_string(opts.pid_file_path()).unwrap_or(String::new());
 
-    if pid.len() == 0 && !opts.silent {
-        log_not_running();
+    if pid.len() == 0 {
+        if !opts.silent {
+            log_not_running();
+        }
         return;
     }
 
