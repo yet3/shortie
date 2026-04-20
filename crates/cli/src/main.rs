@@ -31,10 +31,6 @@ struct CmdArgs {
 #[derive(Subcommand)]
 enum Cmds {
     /// Start shortie-daemon
-    Parse {
-        #[command(flatten)]
-        args: CmdArgs,
-    },
     Start {
         #[command(flatten)]
         args: CmdArgs,
@@ -76,24 +72,6 @@ fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Cmds::Parse { args } => {
-            let opts = &make_opts(args);
-
-            // let mut t = ShortTokenizer::new("this {{embed ./tak}} is\na embed");
-            // let mut t = ShortTokenizer::new("this {var tak} {embed ./tak} is\na embed");
-            let mut t = ShortTokenizer::new("aa: {now} asdf -> {{now %d-%m}} this is\na embed");
-            let tokens = t.tokenize();
-            dbg!("TOKENS: {:?}", tokens);
-
-            match parse_config(&opts.config) {
-                Ok(config) => {
-                    println!("{:?}", config);
-                }
-                Err(e) => {
-                    panic!("{}", e);
-                }
-            }
-        }
         Cmds::Start { args } => {
             start_dameon(&make_opts(args));
         }
