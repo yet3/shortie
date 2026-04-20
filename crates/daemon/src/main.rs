@@ -1,9 +1,15 @@
+use chrono::{DateTime, Local};
 use clap::Parser;
 use enigo::{Enigo, Key, Keyboard, Settings};
 use rdev::{Event, EventType, Key as RKey, listen};
-use shortie_common::config::{Config, GroupedShorts, parse_config};
+use shortie_common::{
+    config::{Config, GroupedShorts, Short, parse_config},
+    tokenizer::{FuncKind, ShortToken, ShortTokenizer},
+};
 use std::{
     collections::HashMap,
+    fs,
+    path::Path,
     sync::{Arc, Mutex},
 };
 
@@ -21,6 +27,61 @@ fn backspace(enigo: &mut Enigo, times: usize) {
 struct InputState {
     current_input: String,
     enigo: Enigo,
+}
+
+fn resolve_tokens(
+    config: &Config,
+    short: &Short,
+    tokens: &Vec<ShortToken>,
+    now: &DateTime<Local>,
+    depth: usize,
+) -> String {
+    let mut output = String::new();
+
+    if depth >= 10 {
+        eprintln!("Reached content resolution limit: {}", depth);
+        return output;
+    }
+
+    let tokenize_content = |str: &str| -> String {
+        let mut tokenizer = ShortTokenizer::new(str);
+        let tokens = tokenizer.tokenize().unwrap();
+        resolve_tokens(config, short, &tokens, now, depth + 1)
+    };
+
+    for token in tokens {
+        match token {
+            ShortToken::Text { value, .. } => {
+                output.push_str(value);
+            }
+            ShortToken::Func { func, .. } => match func {
+                FuncKind::Embed { path } => {
+                    let p = Path::new(&config.conf_paths[short.path_idx])
+                        .parent()
+                        .unwrap()
+                        .join(path);
+                    let str = fs::read_to_string(p).unwrap();
+                    output.push_str(&tokenize_content(&str));
+                }
+                FuncKind::Now { format } => {
+                    output.push_str(now.format(format.as_str()).to_string().as_str());
+                }
+                FuncKind::Var { name } => match short.vars.get(name).or(config.vars.get(name)) {
+                    Some(var) => {
+                        output.push_str(&tokenize_content(&var.value));
+                    }
+                    None => {
+                        println!("Variable missing: \"{}\"", name)
+                    }
+                },
+            },
+            ShortToken::NewLine { .. } => {
+                output.push('\n');
+            }
+        }
+    }
+
+    output
 }
 
 fn event_callback(event: Event, config: &Config, state: &Mutex<InputState>) {
@@ -65,7 +126,12 @@ fn event_callback(event: Event, config: &Config, state: &Mutex<InputState>) {
                             if s.current_input == short.name {
                                 s.current_input.clear();
                                 backspace(&mut s.enigo, short.name.len());
-                                s.enigo.text(&short.output).unwrap();
+
+                                let now: DateTime<Local> = Local::now();
+                                let output = resolve_tokens(config, short, &short.tokens, &now, 0);
+
+                                s.enigo.text(&output).unwrap();
+
                                 break;
                             }
                         }
@@ -92,6 +158,8 @@ fn main() {
         return Config {
             max_len: 0,
             groups: HashMap::new(),
+            vars: HashMap::new(),
+            conf_paths: vec![],
         };
     });
 

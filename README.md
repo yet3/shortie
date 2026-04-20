@@ -38,17 +38,35 @@ Options:
   -h, --help             Print help
 ```
 
+### Functions
+- `embed <FILE_PATH>`
+- `now <FORMAT?>`
+- `var <NAME>`
+
 ### Example Config 
 `.config/shortie/config.yaml` (supports multiple config files)
 ```yaml
 prefix: ";"
+vars:
+  - name: "name"
+    value: "Max"
 shorts:
   - name: "l3"
-    output: "localhost:3000"
+    content: "localhost:3000"
   - name: "l4"
-    output: "localhost:4321"
+    content: "localhost:4321"
   - name: "l5"
-    output: "localhost:5173"
+    content: "localhost:5173"
+  - name: "time"
+    content: "{now %H:%M:%S}"
+  - name: "em1"
+    content: "{embed ./templates/email_1.txt}"
+  - name: "intro"
+    content: "{var start} {var name}"
+    vars:
+      - name: "start"
+        value: "My name is"
+
 ```
 
 ### Example Usage

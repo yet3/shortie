@@ -8,6 +8,7 @@ shortie-common = { path = "../common" }
 clap = { workspace = true }
 serde = { workspace = true }
 serde-saphyr = { workspace = true }
+chrono = { workspace = true }
 enigo = "0.6.1"
 rdev = "0.5.3"
 
