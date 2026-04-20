@@ -28,7 +28,7 @@ impl DaemonOpts {
         DaemonOpts {
             config: String::from(
                 PathBuf::from(dirs::home_dir().expect("Failed to get path from $HOME"))
-                    .join(".config/shortie2")
+                    .join(".config/shortie")
                     .to_string_lossy()
                     .to_string(),
             ),
