@@ -4,8 +4,7 @@ use crate::{
     cli::{print_daemon_status, start_dameon, stop_daemon},
     daemon::DaemonOpts,
 };
-use clap::{Args, Error, Parser, Subcommand};
-use shortie_common::{config::parse_config, tokenizer::ShortTokenizer};
+use clap::{Args, Parser, Subcommand};
 
 #[derive(Parser)]
 struct Cli {
