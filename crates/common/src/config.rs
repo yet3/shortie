@@ -24,6 +24,7 @@ pub struct Short {
     pub tokens: Vec<ShortToken>,
     pub kind: ShortKind,
     pub vars: HashMap<String, Var>,
+    pub enter: bool
 }
 
 #[derive(Debug, Deserialize)]
@@ -38,6 +39,7 @@ pub struct ConfigShort {
     pub content: String,
     pub kind: Option<ShortKind>,
     pub vars: Option<Vec<Var>>,
+    pub enter: Option<bool>
 }
 
 #[derive(Debug)]
@@ -211,6 +213,7 @@ pub fn parse_config(config_path: &str) -> Result<Config, ConfigError> {
                         kind,
                         vars,
                         tokens,
+                        enter: short.enter.unwrap_or(false),
                     };
 
                     if groups.contains_key(&prefix) {

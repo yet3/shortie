@@ -1,6 +1,6 @@
 use chrono::{DateTime, Local};
 use clap::Parser;
-use enigo::{Enigo, Key, Keyboard, Settings};
+use enigo::{Direction, Enigo, Key, Keyboard, Settings};
 use rdev::{Event, EventType, Key as RKey, listen};
 use shortie_common::{
     config::{Config, GroupedShorts, Short, parse_config},
@@ -131,6 +131,10 @@ fn event_callback(event: Event, config: &Config, state: &Mutex<InputState>) {
                                 let output = resolve_tokens(config, short, &short.tokens, &now, 0);
 
                                 s.enigo.text(&output).unwrap();
+
+                                if short.enter {
+                                    s.enigo.key(Key::Return, Direction::Click).unwrap();
+                                }
 
                                 break;
                             }

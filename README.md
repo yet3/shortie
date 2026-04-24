@@ -57,6 +57,9 @@ shorts:
     content: "localhost:4321"
   - name: "l5"
     content: "localhost:5173"
+  - name: "git"
+    content: "https://github.com"
+    enter: true
   - name: "time"
     content: "{now %H:%M:%S}"
   - name: "em1"
