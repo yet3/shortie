@@ -1,5 +1,5 @@
 use std::fmt::Write;
-use std::{fs, vec};
+use std::vec;
 use thiserror::Error;
 
 #[derive(Debug)]
