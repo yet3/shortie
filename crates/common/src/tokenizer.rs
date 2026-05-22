@@ -101,7 +101,7 @@ impl ShortTokenizer {
     }
 
     fn get_char(&self) -> Option<char> {
-        if self.caret < self.chars.len() - 1 {
+        if self.caret < self.chars.len() {
             return Some(self.chars[self.caret]);
         }
         None
